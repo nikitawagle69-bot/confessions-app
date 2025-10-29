@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confession: Anonymous Confessions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            flex: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #764ba2;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .confession-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .confession-form textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .confession-form input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .confession-form button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .confession-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .confession-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .confession-meta {
+            font-size: 14px;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        /* Secret Code Link - Looks like normal footer text */
+        .secret-code-link {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secret-code-link:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .secret-code-link .code {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 0 5px;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1001;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .admin-panel h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .admin-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .close-admin {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .sender-info {
+            font-size: 12px;
+            color: #28a745;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            border-left: 3px solid #28a745;
+        }
+
+        .admin-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #155724;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 20px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Panel Overlay -->
+    <div class="admin-overlay" id="adminOverlay" onclick="toggleAdminPanel()"></div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <button class="close-admin" onclick="toggleAdminPanel()">×</button>
+        <h2>🔒 Private Confessions Archive</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button onclick="clearAllConfessions()" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">Clear All Confessions</button>
+            <div style="font-size: 12px; color: #6c757d; margin-top: 10px;">
+                Total Confessions: <span id="confessionCount">0</span>
+            </div>
+        </div>
+        <div id="adminConfessionsContainer">
+            <!-- Admin view of confessions with sender info -->
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Anonymous Confessions</h1>
+        
+        <div class="confession-form">
+            <textarea id="confessionText" placeholder="Write your anonymous confession here..."></textarea>
+            <input type="email" id="recipientEmail" placeholder="Recipient's email *" required>
+            <div id="emailError" class="error"></div>
+            <button onclick="sendConfession()">Send Confession Anonymously</button>
+        </div>
+
+        <div class="disclaimer">
+            <strong>Note:</strong> Confessions are completely anonymous. 
+            The recipient will not know who sent this message. Only you can send confessions - they are private.
+        </div>
+
+        <!-- NO PUBLIC VIEW OF CONFESSIONS -->
+        
+        <div id="successMessage" class="success-message" style="display: none;">
+            ✅ Confession sent successfully! It's now anonymous and secure.
+        </div>
+    </div>
+
+    <!-- Secret Code Link - Looks like normal footer text -->
+    <div class="secret-code-link" onclick="toggleAdminPanel()">
+        Privacy Protected • Secure Connection • ID: <span class="code">CONF-2024</span> • Encrypted
+    </div>
+
+    <div class="footer">
+        &copy; 2024 Anonymous Confessions App • All rights reserved
+    </div>
+
+    <script>
+        let adminPassword = "secret123"; // Change this to your secret password
+        
+        // Load confessions when page loads (for admin only)
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdminConfessions();
+        });
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function sendConfession() {
+            const text = document.getElementById('confessionText').value;
+            const email = document.getElementById('recipientEmail').value;
+            const errorElement = document.getElementById('emailError');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Clear previous errors
+            errorElement.textContent = '';
+            successMessage.style.display = 'none';
+            
+            // Validation
+            if (!text.trim()) {
+                alert('Please write a confession before sending!');
+                return;
+            }
+            
+            if (!email.trim()) {
+                errorElement.textContent = 'Email is required!';
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                errorElement.textContent = 'Please enter a valid email address!';
+                return;
+            }
+            
+            // Create confession card
+            const confession = {
+                text: text,
+                recipient: email,
+                sender: 'Anonymous',
+                timestamp: new Date().toLocaleString(),
+                id: Date.now(),
+                userInfo: 'User-' + Math.floor(Math.random() * 1000) // Simulated user ID
+            };
+            
+            // Save to localStorage
+            saveConfession(confession);
+            
+            // Clear form and show success
+            document.getElementById('confessionText').value = '';
+            document.getElementById('recipientEmail').value = '';
+            successMessage.style.display = 'block';
+            
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        function saveConfession(confession) {
+            const confessions = JSON.parse(localStorage.getItem('confessions') || '[]');
+            confessions.unshift(confession); // Add to beginning (newest first)
+            localStorage.setItem('confessions', JSON.stringify(confessions));
+            loadAdminConfessions(); // Update admin view if open
+        }
+
+        function loadAdminConfessions() {
+            const adminContainer = document.getElementById('adminConfessionsContainer');
+            const confessionCount = document.getElementById('confessionCount');
+            const confessions = JSON.parse(localStorage.getItem('confessions') || '[]');
+            
+            // Update confession count
+            confessionCount.textContent = confessions.length;
+            
+            // Admin view (with sender info) - ONLY visible through secret code
+            if (confessions.length === 0) {
+                adminContainer.innerHTML = '<div class="empty-state">No confessions yet. Wait for people to send them!</div>';
+            } else {
+                adminContainer.innerHTML = confessions.map(confession => `
+                    <div class="admin-card">
+                        <div class="confession-text">"${confession.text}"</div>
+                        <div class="confession-meta">
+                            <span>To: ${confession.recipient}</span>
+                            <span>${confession.timestamp}</span>
+                        </div>
+                        <div class="sender-info">
+                            <strong>Sender ID:</strong> ${confession.userInfo} | 
+                            <strong>Confession ID:</strong> ${confession.id}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleAdminPanel() {
+            const panel = document.getElementById('adminPanel');
+            const overlay = document.getElementById('adminOverlay');
+            
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                overlay.style.display = 'none';
+            } else {
+                // Ask for password
+                const password = prompt('Enter private access code:');
+                if (password === adminPassword) {
+                    panel.style.display = 'block';
+                    overlay.style.display = 'block';
+                    loadAdminConfessions(); // Refresh when opening
+                } else if (password !== null) {
+                    alert('Access Denied! Invalid code.');
+                }
+            }
+        }
+
+        function clearAllConfessions() {
+            if (confirm('Are you sure you want to delete ALL confessions? This cannot be undone!')) {
+                localStorage.removeItem('confessions');
+                loadAdminConfessions();
+                alert('All confessions cleared!');
+            }
+        }
+    </script>
+</body>
+</html>
